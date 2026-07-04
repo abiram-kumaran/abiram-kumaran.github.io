@@ -1539,3 +1539,51 @@ textarea.input-field {
   .hero .container { grid-template-columns: 1fr 0.85fr; }
 
 }
+
+
+/*-----------------------------------*\
+  #HERO HEADING SIZE OVERRIDE
+\*-----------------------------------*/
+
+/* Keep the hero h1 at the base size regardless of breakpoint */
+.hero-content .h1 {
+  font-size: 4.5rem;
+}
+
+/*-----------------------------------*\
+  #DECRYPTED TEXT — hero heading only
+\*-----------------------------------*/
+
+#decrypted-text-root {
+  display: inline-block;
+  cursor: default;
+  white-space: pre-wrap;
+}
+
+/* screen-reader label hidden visually */
+.dt-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+}
+
+/* individual characters */
+.dt-char {
+  display: inline;
+  transition: color 0.1s ease;
+}
+
+/* scrambled state — slightly dimmed so the reveal pops */
+.dt-encrypted {
+  color: hsla(0, 0%, 100%, 0.35);
+}
+
+/* revealed / final state — full white like the rest of the title */
+.dt-revealed {
+  color: var(--text-white);
+}

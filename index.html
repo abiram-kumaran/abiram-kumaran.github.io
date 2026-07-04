@@ -78,7 +78,9 @@
           </div>
 
           <div class="hero-content">
-            <h1 class="h1 title">Hi, I'm Abiram Eswar R K</h1>
+            <h1 class="h1 title">
+              <span id="decrypted-text-root" aria-label="Hi, I'm Abiram Eswar R K"></span>
+            </h1>
             <p class="section-text" style="font-size: 1.8rem; margin-top: 20px;">
               Computer Science Student · Azure Certified | Full Stack Developer | DSA &amp; LeetCode Enthusiast
             </p>
@@ -445,6 +447,131 @@
     function openInNewTab(url) {
       window.open(url, '_blank');
     }
+  </script>
+
+  <!-- DecryptedText effect — scoped to hero heading only -->
+  <script>
+    (function () {
+      var TEXT        = "Hi, I'm Abiram Eswar R K";
+      var SPEED       = 90;        // ms between frames
+      var MAX_ITER    = 12;        // scramble iterations before full reveal
+      var SEQUENTIAL  = true;      // reveal one char at a time
+      var DIRECTION   = 'start';   // reveal left → right
+      var CHARS       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%&*';
+
+      var root = document.getElementById('decrypted-text-root');
+      if (!root) return;
+
+      /* ── build sr-only label + visible char spans ── */
+      var srOnly = document.createElement('span');
+      srOnly.className = 'dt-sr-only';
+      srOnly.textContent = TEXT;
+      root.appendChild(srOnly);
+
+      var visibleWrap = document.createElement('span');
+      visibleWrap.setAttribute('aria-hidden', 'true');
+      root.appendChild(visibleWrap);
+
+      var charSpans = TEXT.split('').map(function (ch) {
+        var s = document.createElement('span');
+        s.className = 'dt-char dt-encrypted';
+        s.textContent = ch === ' ' ? '\u00A0' : ch;
+        visibleWrap.appendChild(s);
+        return s;
+      });
+
+      /* ── state ── */
+      var revealedSet = new Set();
+      var intervalId  = null;
+      var iterCount   = 0;
+      var isDecrypted = false;
+      var hasPlayed   = false;
+
+      function randomChar() {
+        return CHARS[Math.floor(Math.random() * CHARS.length)];
+      }
+
+      function nextIndexToReveal() {
+        // sequential left-to-right: next unrevealed index
+        for (var i = 0; i < TEXT.length; i++) {
+          if (!revealedSet.has(i)) return i;
+        }
+        return -1;
+      }
+
+      function renderFrame() {
+        TEXT.split('').forEach(function (ch, i) {
+          var span = charSpans[i];
+          if (ch === ' ') { span.textContent = '\u00A0'; return; }
+          if (revealedSet.has(i)) {
+            span.textContent = TEXT[i];
+            span.className = 'dt-char dt-revealed';
+          } else {
+            span.textContent = randomChar();
+            span.className = 'dt-char dt-encrypted';
+          }
+        });
+      }
+
+      function startDecrypt() {
+        if (intervalId) clearInterval(intervalId);
+        revealedSet = new Set();
+        iterCount   = 0;
+        isDecrypted = false;
+
+        intervalId = setInterval(function () {
+          if (SEQUENTIAL) {
+            var next = nextIndexToReveal();
+            if (next === -1) {
+              finish();
+              return;
+            }
+            revealedSet.add(next);
+            renderFrame();
+          } else {
+            iterCount++;
+            renderFrame();
+            if (iterCount >= MAX_ITER) finish();
+          }
+        }, SPEED);
+      }
+
+      function finish() {
+        clearInterval(intervalId);
+        intervalId  = null;
+        isDecrypted = true;
+        // snap all chars to final revealed state
+        charSpans.forEach(function (s, i) {
+          s.textContent = TEXT[i] === ' ' ? '\u00A0' : TEXT[i];
+          s.className   = 'dt-char dt-revealed';
+        });
+      }
+
+      function resetToScrambled() {
+        clearInterval(intervalId);
+        intervalId  = null;
+        isDecrypted = false;
+        revealedSet = new Set();
+        renderFrame();
+      }
+
+      /* ── auto-play once on scroll into view ── */
+      if ('IntersectionObserver' in window) {
+        var observer = new IntersectionObserver(function (entries) {
+          entries.forEach(function (entry) {
+            if (entry.isIntersecting && !hasPlayed) {
+              hasPlayed = true;
+              observer.disconnect();
+              startDecrypt();
+            }
+          });
+        }, { threshold: 0.2 });
+        observer.observe(root);
+      } else {
+        // fallback: just show the text
+        finish();
+      }
+    })();
   </script>
 
 </body>
