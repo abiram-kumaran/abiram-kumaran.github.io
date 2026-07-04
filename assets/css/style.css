@@ -1545,9 +1545,10 @@ textarea.input-field {
   #HERO HEADING SIZE OVERRIDE
 \*-----------------------------------*/
 
-/* Keep the hero h1 at the base size regardless of breakpoint */
+/* Scale hero h1 responsively so it never wraps per-character on small screens */
 .hero-content .h1 {
-  font-size: 4.5rem;
+  font-size: clamp(2.4rem, 6vw, 4.5rem);
+  line-height: 1.2;
 }
 
 /*-----------------------------------*\
@@ -1555,9 +1556,10 @@ textarea.input-field {
 \*-----------------------------------*/
 
 #decrypted-text-root {
-  display: inline-block;
+  display: inline;
   cursor: default;
-  white-space: pre-wrap;
+  white-space: normal;
+  word-break: break-word;
 }
 
 /* screen-reader label hidden visually */
